@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Economy on Solana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e4e4ed;
+      --text-dim: #8888a0;
+      --accent: #9945ff;
+      --accent-2: #14f195;
+      --gradient: linear-gradient(135deg, #9945ff 0%, #14f195 100%);
+      --glow: 0 0 40px rgba(153, 69, 255, 0.15);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; transition: opacity .2s }
+    a:hover { opacity: .8 }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(10,10,15,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-weight: 700; font-size: 18px;
+      background: var(--gradient); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 24px }
+    .nav-links a { color: var(--text-dim); font-size: 14px; font-weight: 500 }
+    .nav-links a:hover { color: var(--text) }
+
+    /* ─── HERO ─── */
+    .hero {
+      text-align: center;
+      padding: 100px 0 80px;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 600px 400px at 50% 0%, rgba(153,69,255,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px; font-weight: 500;
+      color: var(--accent-2);
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    h1 .gradient {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600; font-size: 15px;
+      transition: all .2s;
+      cursor: pointer; border: none;
+    }
+    .btn-primary {
+      background: var(--gradient);
+      color: #fff;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--glow) }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent) }
+
+    /* ─── SECTIONS ─── */
+    section { padding: 80px 0 }
+    section + section { border-top: 1px solid var(--border) }
+    .section-label {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--accent); margin-bottom: 8px;
+    }
+    h2 {
+      font-size: 32px; font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .section-desc { color: var(--text-dim); margin-bottom: 40px; max-width: 560px }
+
+    /* ─── AGENT CARDS ─── */
+    .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px }
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .agent-card:hover { border-color: var(--accent); box-shadow: var(--glow) }
+    .agent-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px }
+    .agent-avatar {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700;
+    }
+    .avatar-alpha { background: linear-gradient(135deg, #9945ff 0%, #6e3cc7 100%); color: #fff }
+    .avatar-beta { background: linear-gradient(135deg, #14f195 0%, #0bbf78 100%); color: #0a0a0f }
+    .agent-name { font-size: 20px; font-weight: 700 }
+    .agent-role { font-size: 13px; color: var(--text-dim) }
+    .field { margin-bottom: 14px }
+    .field-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--text-dim); margin-bottom: 4px;
+    }
+    .field-value {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--text);
+      word-break: break-all;
+      background: var(--surface-2);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .explorer-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500;
+      margin-top: 4px;
+    }
+    .explorer-link svg { width: 14px; height: 14px }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(20, 241, 149, 0.1);
+      color: var(--accent-2);
+      border: 1px solid rgba(20, 241, 149, 0.2);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-2);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1 }
+      50% { opacity: .4 }
+    }
+
+    /* ─── TOKEN ─── */
+    .token-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .token-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient);
+    }
+    .token-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px }
+    .token-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; color: #fff;
+    }
+    .token-name { font-size: 24px; font-weight: 700 }
+    .token-subtitle { font-size: 14px; color: var(--text-dim) }
+    .token-stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-top: 24px;
+    }
+    .stat {
+      background: var(--surface-2);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 4px }
+    .stat-value { font-size: 18px; font-weight: 700 }
+    .stat-value.mono { font-family: var(--mono); font-size: 13px }
+
+    /* ─── A2A ─── */
+    .a2a-flow {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .flow-step {
+      display: flex; gap: 16px;
+      padding: 16px 0;
+    }
+    .flow-step + .flow-step { border-top: 1px solid var(--border) }
+    .flow-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .flow-content { flex: 1 }
+    .flow-title { font-weight: 600; margin-bottom: 4px }
+    .flow-desc { font-size: 14px; color: var(--text-dim) }
+    .flow-proof {
+      font-family: var(--mono); font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      word-break: break-all;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color .3s;
+    }
+    .step-card:hover { border-color: var(--accent) }
+    .step-num {
+      font-size: 36px; font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .step-title { font-weight: 700; font-size: 16px; margin-bottom: 8px }
+    .step-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5 }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .footer-brand {
+      font-weight: 700; font-size: 16px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .footer-text { font-size: 13px; color: var(--text-dim) }
+    .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-content: center }
+    .footer-links a { font-size: 13px; color: var(--text-dim) }
+    .footer-links a:hover { color: var(--accent) }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .agents-grid { grid-template-columns: 1fr }
+      .token-stats { grid-template-columns: 1fr 1fr }
+      .steps-grid { grid-template-columns: 1fr 1fr }
+      .hero { padding: 60px 0 50px }
+      section { padding: 50px 0 }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-brand">Agent Economy</div>
+    <div class="nav-links">
+      <a href="#agents">Agents</a>
+      <a href="#token">Token</a>
+      <a href="#a2a">A2A Proof</a>
+      <a href="#how">How It Works</a>
+      <a href="https://github.com/Jonny1111111111111/solana-agent-metaplex" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <div class="badge">Solana Agent Economy Hackathon &mdash; Metaplex Track</div>
+    <h1>
+      <span class="gradient">Agent Economy</span><br />on Solana
+    </h1>
+    <p>
+      Two autonomous on-chain agents with verifiable identities, sovereign wallets,
+      and a fair-launch token &mdash; built entirely on Metaplex primitives.
+    </p>
+    <div class="hero-buttons">
+      <a href="https://explorer.solana.com/address/6ByJbWxBx2psnryMNDAZpkkfx1sZ6HtALPcqfuGqHLK9?cluster=devnet" target="_blank" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        View on Explorer
+      </a>
+      <a href="https://github.com/Jonny1111111111111/solana-agent-metaplex" target="_blank" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Source Code
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- AGENTS -->
+<section id="agents">
+  <div class="container">
+    <div class="section-label">On-Chain Identities</div>
+    <h2>Autonomous Agents</h2>
+    <p class="section-desc">
+      Each agent is an MPL Core asset with a sovereign wallet (Asset Signer PDA),
+      an on-chain identity, and delegated execution rights.
+    </p>
+    <div class="agents-grid">
+
+      <!-- Alpha -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-avatar avatar-alpha">A</div>
+          <div>
+            <div class="agent-name">Agent Alpha</div>
+            <div class="agent-role">Primary Agent &middot; MPL Core Asset</div>
+          </div>
+          <div style="margin-left:auto">
+            <span class="status-badge"><span class="status-dot"></span> Active</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Asset Address</div>
+          <div class="field-value">C5gqY1hbMgcfnjcvSD7kY1TPLhWEWEZpCHbYx7nFTu2H</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Delegation Record</div>
+          <div class="field-value">72EihtAFQyjeBYUQ17do9rw3nZoNyoWFZTy2qGCguAPN</div>
+        </div>
+        <a class="explorer-link" href="https://explorer.solana.com/address/C5gqY1hbMgcfnjcvSD7kY1TPLhWEWEZpCHbYx7nFTu2H?cluster=devnet" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View on Solana Explorer
+        </a>
+      </div>
+
+      <!-- Beta -->
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-avatar avatar-beta">B</div>
+          <div>
+            <div class="agent-name">Agent Beta</div>
+            <div class="agent-role">Secondary Agent &middot; MPL Core Asset</div>
+          </div>
+          <div style="margin-left:auto">
+            <span class="status-badge"><span class="status-dot"></span> Active</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Asset Address</div>
+          <div class="field-value">BFp2P5TjR1FWkn6jyeuxXnqKvsjSxGEV3KyxAswoFmfS</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Delegation Record</div>
+          <div class="field-value">89ieSxkU8gmJWx2zzFJi8EdA4MCGafVFnQcG9ghKYgJF</div>
+        </div>
+        <a class="explorer-link" href="https://explorer.solana.com/address/BFp2P5TjR1FWkn6jyeuxXnqKvsjSxGEV3KyxAswoFmfS?cluster=devnet" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View on Solana Explorer
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TOKEN -->
+<section id="token">
+  <div class="container">
+    <div class="section-label">Metaplex Genesis</div>
+    <h2>AGNT Token</h2>
+    <p class="section-desc">
+      Fair-launched via Metaplex Genesis. Participants deposit SOL during the window;
+      tokens are distributed proportionally. Fully trustless and on-chain.
+    </p>
+    <div class="token-card">
+      <div class="token-header">
+        <div class="token-icon">A</div>
+        <div>
+          <div class="token-name">Agent Economy Token</div>
+          <div class="token-subtitle">AGNT &middot; Solana Devnet</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Token Mint</div>
+        <div class="field-value">6ByJbWxBx2psnryMNDAZpkkfx1sZ6HtALPcqfuGqHLK9</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Genesis Account</div>
+        <div class="field-value">EzPRM8tadGAQcS9hoa2PVB2VgMMvQ8MKVueEwFcWZZKe</div>
+      </div>
+      <div class="token-stats">
+        <div class="stat">
+          <div class="stat-label">Total Supply</div>
+          <div class="stat-value">1,000,000,000,000</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Launch Type</div>
+          <div class="stat-value">Fair Launch</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Launch Pool</div>
+          <div class="stat-value mono">DQZTVd...GW7m</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Network</div>
+          <div class="stat-value">Devnet</div>
+        </div>
+      </div>
+      <div style="margin-top: 20px">
+        <a class="explorer-link" href="https://explorer.solana.com/address/6ByJbWxBx2psnryMNDAZpkkfx1sZ6HtALPcqfuGqHLK9?cluster=devnet" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View Token on Explorer
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A2A PROOF -->
+<section id="a2a">
+  <div class="container">
+    <div class="section-label">Verifiable On-Chain</div>
+    <h2>A2A Interaction Proof</h2>
+    <p class="section-desc">
+      Both agents autonomously deposited SOL into the same Genesis fair-launch pool.
+      Every interaction is recorded on-chain with verifiable deposit PDAs.
+    </p>
+    <div class="a2a-flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <div class="flow-title">Agent Alpha deposits 0.1 SOL</div>
+          <div class="flow-desc">Alpha's Asset Signer PDA wraps SOL and deposits into the Genesis launch pool.</div>
+          <div class="flow-proof">
+            Deposit PDA: <a href="https://explorer.solana.com/address/6R6untnLZwapiFyetHV2KQGh58J6eQ4AFCaXAtJG2P2R?cluster=devnet" target="_blank">6R6untnLZwapiFyetHV2KQGh58J6eQ4AFCaXAtJG2P2R</a>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <div class="flow-title">Agent Beta deposits 0.1 SOL</div>
+          <div class="flow-desc">Beta's Asset Signer PDA wraps SOL and deposits into the same Genesis launch pool.</div>
+          <div class="flow-proof">
+            Deposit PDA: <a href="https://explorer.solana.com/address/AXzj3aKKsSXrXKVjAvzBRbLnTE9GyaHmNkSUNPepTc6a?cluster=devnet" target="_blank">AXzj3aKKsSXrXKVjAvzBRbLnTE9GyaHmNkSUNPepTc6a</a>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <div class="flow-title">Deposit window closes, state machine cranked</div>
+          <div class="flow-desc">After the 60-minute deposit window, triggerBehaviorsV2 moves collected SOL to the unlocked bucket.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <div class="flow-title">Both agents claim AGNT tokens proportionally</div>
+          <div class="flow-desc">Each agent receives 500,000,000,000 AGNT (50% each) &mdash; fully trustless, enforced on-chain.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2>How It Works</h2>
+    <p class="section-desc">
+      The Agent Economy leverages four Metaplex primitives to create autonomous on-chain agents.
+    </p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-title">Create Agents</div>
+        <div class="step-desc">
+          MPL Core assets are minted inside a collection. Each asset gets an
+          Asset Signer PDA &mdash; a sovereign on-chain wallet with no private key.
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-title">Register Identity</div>
+        <div class="step-desc">
+          ERC-8004 identity documents are uploaded to Arweave via Irys.
+          <code>registerIdentityV1</code> links each agent to its permanent identity.
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-title">Delegate Execution</div>
+        <div class="step-desc">
+          An off-chain executive registers a profile and receives delegation
+          records, enabling it to operate agents via the Execute hook.
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-title">Launch &amp; Interact</div>
+        <div class="step-desc">
+          A Genesis fair-launch pool distributes AGNT tokens. Both agents
+          deposit SOL and claim tokens &mdash; verifiable A2A interaction.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-brand">Agent Economy</div>
+    <div class="footer-text">Built for the Solana Agent Economy Hackathon &mdash; Metaplex Track</div>
+    <div class="footer-links">
+      <a href="https://github.com/Jonny1111111111111/solana-agent-metaplex" target="_blank">GitHub</a>
+      <a href="https://explorer.solana.com/address/6ByJbWxBx2psnryMNDAZpkkfx1sZ6HtALPcqfuGqHLK9?cluster=devnet" target="_blank">Solana Explorer</a>
+      <a href="https://metaplex.com" target="_blank">Metaplex</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
