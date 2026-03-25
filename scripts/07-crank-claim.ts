@@ -26,6 +26,7 @@ async function tryStep(label: string, fn: () => Promise<void>) {
       'InvalidDepositPda',           // error name prefix
       'deposit PDA account is invalid', // error message text
       'AccountNotFound',
+      'ClaimNotStarted',
     ].some(s => haystack.includes(s));
 
     if (skip) {
