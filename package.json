@@ -1,0 +1,31 @@
+{
+  "name": "agent-economy",
+  "version": "1.0.0",
+  "description": "Solana Agent Economy Hackathon - Metaplex Track",
+  "scripts": {
+    "setup":        "ts-node scripts/01-setup.ts",
+    "create-agents":"ts-node scripts/02-create-agents.ts",
+    "register":     "ts-node scripts/03-register-agents.ts",
+    "launch-token": "ts-node scripts/04-launch-token.ts",
+    "executive":    "ts-node scripts/05-executive.ts",
+    "a2a":          "ts-node scripts/06-a2a-demo.ts",
+    "crank":        "ts-node scripts/07-crank-claim.ts",
+    "demo":         "ts-node scripts/08-full-demo.ts"
+  },
+  "dependencies": {
+    "@metaplex-foundation/genesis": "latest",
+    "@metaplex-foundation/mpl-agent-registry": "latest",
+    "@metaplex-foundation/mpl-core": "latest",
+    "@metaplex-foundation/mpl-toolbox": "latest",
+    "@metaplex-foundation/umi": "latest",
+    "@metaplex-foundation/umi-bundle-defaults": "latest",
+    "@metaplex-foundation/umi-uploader-irys": "latest",
+    "@solana/web3.js": "^1.98.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,6 @@
+node_modules/
+dist/
+keypairs/
+wallets.json
+.env
+state/deployed.json
