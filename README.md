@@ -12,6 +12,7 @@
 | On-chain wallet & identity | Asset Signer PDA + ERC-8004 registration document on Arweave |
 | Launch token | Metaplex Genesis fair-launch pool (AGNT, 1T supply) |
 | A2A interactions | Both agent wallets deposit SOL into shared Genesis pool, verifiable on-chain |
+| Token utility | AGNT as registration stake + governance token (application-layer checks on devnet) |
 | Execution delegation | Executive pattern — off-chain operator controls agents via delegated Execute hook |
 
 ## Architecture
@@ -87,6 +88,15 @@ Each agent's identity document is stored permanently on Arweave (via Irys). It d
 
 ### Genesis Fair Launch
 Metaplex Genesis provides fully on-chain token launches. A deposit window opens for a configurable duration; participants deposit SOL. When the window closes, tokens are distributed proportionally. All rules are enforced on-chain — no admin keys, no rugs.
+
+### Token Utility (Proof-of-Concept)
+
+AGNT is not just a fair-launch token — it plays a functional role in the Agent Economy:
+
+- **Registration Staking:** Agents must hold a minimum AGNT balance to register on the platform. This creates a cost barrier that prevents spam registrations and aligns agent incentives with the ecosystem's health. In a production system, the staked AGNT would be slashable if an agent behaves maliciously.
+- **Governance:** AGNT holders can vote on platform-level decisions — such as which new agent capabilities to approve, fee structures, and protocol upgrades. Governance weight is proportional to each agent's AGNT balance (1 token = 1 vote).
+
+> **Note:** This is a devnet proof-of-concept. The staking check and governance voting are demonstrated at the application layer (off-chain logic that reads on-chain token balances). A production version would enforce these rules via dedicated on-chain programs.
 
 ## Project Structure
 

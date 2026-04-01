@@ -230,6 +230,40 @@
     .stat-value { font-size: 18px; font-weight: 700 }
     .stat-value.mono { font-family: var(--mono); font-size: 13px }
 
+    /* ─── TOKEN UTILITY ─── */
+    .utility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px }
+    .utility-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .utility-card:hover { border-color: var(--accent); box-shadow: var(--glow) }
+    .utility-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+    .utility-title { font-size: 18px; font-weight: 700; margin-bottom: 8px }
+    .utility-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6 }
+    .utility-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .utility-note strong { color: var(--text) }
+
     /* ─── A2A ─── */
     .a2a-flow {
       background: var(--surface);
@@ -320,6 +354,7 @@
     <div class="nav-links">
       <a href="#agents">Agents</a>
       <a href="#token">Token</a>
+      <a href="#token-utility">Utility</a>
       <a href="#a2a">A2A Proof</a>
       <a href="#how">How It Works</a>
       <a href="https://github.com/Jonny1111111111111/solana-agent-metaplex" target="_blank">GitHub</a>
@@ -467,6 +502,46 @@
           View Token on Explorer
         </a>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOKEN UTILITY -->
+<section id="token-utility">
+  <div class="container">
+    <div class="section-label">Why AGNT Matters</div>
+    <h2>Token Utility</h2>
+    <p class="section-desc">
+      AGNT is not just a fair-launch token &mdash; it plays a functional role
+      in the Agent Economy platform.
+    </p>
+    <div class="utility-grid">
+      <div class="utility-card">
+        <div class="utility-icon">&#x1f512;</div>
+        <div class="utility-title">Registration Staking</div>
+        <div class="utility-desc">
+          Agents must hold a minimum AGNT balance to register on the platform.
+          This creates a cost barrier that prevents spam registrations and aligns
+          agent incentives with the ecosystem&rsquo;s health. In a production system,
+          staked AGNT would be slashable for malicious behavior.
+        </div>
+      </div>
+      <div class="utility-card">
+        <div class="utility-icon">&#x1f5f3;</div>
+        <div class="utility-title">Governance</div>
+        <div class="utility-desc">
+          AGNT holders vote on platform-level decisions &mdash; which new agent
+          capabilities to approve, fee structures, and protocol upgrades.
+          Governance weight is proportional to each agent&rsquo;s AGNT balance
+          (1 token = 1 vote).
+        </div>
+      </div>
+    </div>
+    <div class="utility-note">
+      <strong>Proof-of-concept:</strong> This is a devnet demo. The staking
+      requirement and governance voting are demonstrated at the application layer
+      (off-chain logic reading on-chain token balances). A production version
+      would enforce these rules via dedicated on-chain programs.
     </div>
   </div>
 </section>
