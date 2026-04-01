@@ -337,11 +337,51 @@
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 640px) {
-      .agents-grid { grid-template-columns: 1fr }
-      .token-stats { grid-template-columns: 1fr 1fr }
-      .steps-grid { grid-template-columns: 1fr 1fr }
+      .container { padding: 0 16px }
       .hero { padding: 60px 0 50px }
       section { padding: 50px 0 }
+      h1 { font-size: 32px }
+      h2 { font-size: 24px }
+
+      /* Nav */
+      nav .container { flex-wrap: wrap; gap: 12px }
+      .nav-links { gap: 14px; flex-wrap: wrap }
+      .nav-links a { font-size: 13px }
+
+      /* Hero buttons full width */
+      .hero-buttons { flex-direction: column; align-items: stretch }
+      .btn { justify-content: center; width: 100% }
+
+      /* Grids stack to single column */
+      .agents-grid { grid-template-columns: 1fr }
+      .utility-grid { grid-template-columns: 1fr }
+      .steps-grid { grid-template-columns: 1fr }
+      .token-stats { grid-template-columns: 1fr 1fr }
+
+      /* Cards reduce padding */
+      .agent-card { padding: 20px }
+      .utility-card { padding: 20px }
+      .token-card { padding: 20px }
+      .a2a-flow { padding: 20px }
+      .step-card { padding: 20px }
+
+      /* Prevent text overflow on mono values */
+      .field-value { font-size: 12px; overflow-wrap: break-word; word-break: break-all }
+      .flow-proof { font-size: 11px }
+      .stat-value.mono { font-size: 12px }
+
+      /* Agent header stacks on very small screens */
+      .agent-header { flex-wrap: wrap }
+
+      /* Footer */
+      .footer-links { flex-wrap: wrap; gap: 12px }
+    }
+
+    @media (max-width: 400px) {
+      .token-stats { grid-template-columns: 1fr }
+      .nav-links { gap: 10px }
+      .nav-links a { font-size: 12px }
+      .steps-grid { grid-template-columns: 1fr }
     }
   </style>
 </head>
