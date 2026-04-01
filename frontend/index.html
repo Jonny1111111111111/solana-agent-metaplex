@@ -57,6 +57,7 @@
     .nav-links { display: flex; gap: 24px }
     .nav-links a { color: var(--text-dim); font-size: 14px; font-weight: 500 }
     .nav-links a:hover { color: var(--text) }
+    .nav-toggle { display: none; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: var(--text); cursor: pointer; font-size: 20px; line-height: 1 }
 
     /* ─── HERO ─── */
     .hero {
@@ -134,7 +135,7 @@
     .section-desc { color: var(--text-dim); margin-bottom: 40px; max-width: 560px }
 
     /* ─── AGENT CARDS ─── */
-    .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px }
+    .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 20px }
     .agent-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -231,7 +232,7 @@
     .stat-value.mono { font-family: var(--mono); font-size: 13px }
 
     /* ─── TOKEN UTILITY ─── */
-    .utility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px }
+    .utility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 20px }
     .utility-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -340,38 +341,73 @@
       .container { padding: 0 16px }
       .hero { padding: 60px 0 50px }
       section { padding: 50px 0 }
-      h1 { font-size: 32px }
-      h2 { font-size: 24px }
+      h1 { font-size: 28px }
+      h2 { font-size: 22px }
+      .hero p { font-size: 15px; margin-bottom: 24px }
+      .badge { font-size: 12px; padding: 5px 12px }
+      .section-desc { font-size: 14px; margin-bottom: 28px }
 
-      /* Nav */
-      nav .container { flex-wrap: wrap; gap: 12px }
-      .nav-links { gap: 14px; flex-wrap: wrap }
-      .nav-links a { font-size: 13px }
+      /* Hamburger nav */
+      .nav-toggle { display: block }
+      .nav-links {
+        display: none; flex-direction: column; gap: 0;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--surface); border-bottom: 1px solid var(--border);
+        padding: 8px 0;
+      }
+      .nav-links.open { display: flex }
+      .nav-links a { padding: 12px 24px; font-size: 15px; border-bottom: 1px solid var(--border) }
+      .nav-links a:last-child { border-bottom: none }
+      nav { position: sticky; }
+      nav .container { position: relative }
 
       /* Hero buttons full width */
       .hero-buttons { flex-direction: column; align-items: stretch }
       .btn { justify-content: center; width: 100% }
 
-      /* Grids stack to single column */
+      /* All grids stack to single column */
       .agents-grid { grid-template-columns: 1fr }
       .utility-grid { grid-template-columns: 1fr }
-      .steps-grid { grid-template-columns: 1fr }
+      .steps-grid { grid-template-columns: 1fr 1fr }
       .token-stats { grid-template-columns: 1fr 1fr }
 
       /* Cards reduce padding */
       .agent-card { padding: 20px }
       .utility-card { padding: 20px }
       .token-card { padding: 20px }
-      .a2a-flow { padding: 20px }
+      .a2a-flow { padding: 16px }
       .step-card { padding: 20px }
+      .utility-note { padding: 16px }
 
-      /* Prevent text overflow on mono values */
-      .field-value { font-size: 12px; overflow-wrap: break-word; word-break: break-all }
+      /* Truncate wallet addresses with ellipsis */
+      .field-value {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .flow-proof { font-size: 11px }
+      .flow-proof a {
+        display: inline-block;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+      }
       .stat-value.mono { font-size: 12px }
 
-      /* Agent header stacks on very small screens */
-      .agent-header { flex-wrap: wrap }
+      /* Agent header wrap */
+      .agent-header { flex-wrap: wrap; gap: 10px }
+      .agent-name { font-size: 18px }
+
+      /* Token header */
+      .token-name { font-size: 20px }
+
+      /* Flow steps */
+      .flow-step { gap: 12px }
+      .flow-title { font-size: 14px }
+      .flow-desc { font-size: 13px }
 
       /* Footer */
       .footer-links { flex-wrap: wrap; gap: 12px }
@@ -379,8 +415,6 @@
 
     @media (max-width: 400px) {
       .token-stats { grid-template-columns: 1fr }
-      .nav-links { gap: 10px }
-      .nav-links a { font-size: 12px }
       .steps-grid { grid-template-columns: 1fr }
     }
   </style>
@@ -391,6 +425,7 @@
 <nav>
   <div class="container">
     <div class="nav-brand">Agent Economy</div>
+    <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open');this.textContent=this.textContent==='☰'?'✕':'☰'">☰</button>
     <div class="nav-links">
       <a href="#agents">Agents</a>
       <a href="#token">Token</a>
